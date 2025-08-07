@@ -65,27 +65,21 @@ def abuseIP(ip_address):
 
 def alienvault(ip_address):
     alienvault_passive_dns = list()
-    passive_dns_url = "https://otx.alienvault.com/api/v1/indicators/IPv4/103.157.97.15/passive_dns"    
+    passive_dns_url = f"https://otx.alienvault.com/api/v1/indicators/IPv4/{ip_address}/passive_dns"    
     passive_dns_response = requests.get(url=passive_dns_url)
-    decodedResponse = json.loads(passive_dns_response.text)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    passive_dns_response_decode = json.loads(passive_dns_response.text)
+    if len(passive_dns_response_decode) > 0:
+        for item in passive_dns_response_decode['passive_dns']:
+            temp_dict = {
+                "hostname": item['hostname'],
+                "record_type": item['record_type'],
+                "last_seen": item['last'],
+                "country": item['flag_title']
+            }
+            alienvault_passive_dns.append(temp_dict)
+        
+        IOC_data["alienvault_passive_DNS"] = alienvault_passive_dns
+    
 
 
 
@@ -107,7 +101,7 @@ def alienvault(ip_address):
 def main():
     ip_address = '47.251.93.227'
     IOC_data['ip_address'] = ip_address
-    # abuseIP(ip_address)
+    abuseIP(ip_address=ip_address)
     alienvault(ip_address=ip_address)
     print(IOC_data)
 
